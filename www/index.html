@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Calculateur en temps réel</title>
+<meta name="theme-color" content="#000000">
+<style>
+body { 
+    font-family: Arial; 
+    margin: 0;            /* supprime les marges par défaut */
+    height: 100vh;        /* prend toute la hauteur de l'écran */
+    background: #000000;
+    display: flex;        /* active flexbox */
+    justify-content: center; /* centre horizontalement */
+    align-items: center;     /* centre verticalement */
+    background-image: url('logo.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+.top-left-body {
+  position: absolute;       /* en haut à droite du body ou du conteneur */
+  top: 10px;
+  left: 10px;
+  width: 50vw;              /* 10% de la largeur de l’écran */
+  max-width: 200px;         /* limite maximale pour ne pas exploser */
+  height: auto;             /* garde les proportions */
+  z-index: -1;
+}
+
+@media (max-width: 600px) {
+  .top-right-body {
+    width: 20vw;            /* un peu plus grand sur petits écrans */
+    max-width: 80px;
+  }
+}
+
+.lien,
+.lien:visited,
+.lien:link,
+.lien:active {
+    color: #ffcd33;
+    text-decoration: none;
+     }
+
+.result {
+    font-size: 35px;
+    color: white;
+    font-weight: bold;
+        }
+
+.warning {
+    font-size: 20px;
+    color: red;
+    font-weight: bold;
+         }
+
+
+.container {
+    position: fixed; 
+    z-index: 1;
+    
+    /* MODIFICATION CLÉ : OCCUPER TOUT L'ÉCRAN */
+    width: 100vw;         /* 100% de la largeur de la vue */
+    height: 100vh;        /* 100% de la hauteur de la vue */
+    max-width: none;      /* Supprime la limitation de largeur */
+    
+    /* Styles de centrage (pour le contenu interne) */
+    display: flex;        /* Ajoute Flexbox */
+    flex-direction: column; /* Organise les éléments verticalement */
+    justify-content: center; /* Centre le contenu interne verticalement */
+    align-items: center;  /* Centre le contenu interne horizontalement */
+    
+    /* Supprimez le padding pour qu'il touche les bords */
+    padding: 0; 
+    border-radius: 0;     /* Supprime les coins arrondis */
+    box-shadow: none;     /* Supprime l'ombre */
+    
+    background: rgba(0, 0, 0, 0.8); 
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center center;
+    text-align: center;
+    color: #FFFFFF;
+}
+
+input {
+    width: 80%;        
+    max-width: 300px;  
+    padding: 8px;
+    margin: 10px 0;
+    font-size: 16px;
+  }
+  #result {
+    margin-top: 20px;
+    font-size: 40px;
+    font-weight: bold;
+    color: #333;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+  <h2>Calculateur de Prix</h2>
+  <label for="dateB1">Date sur l'étiquette &#40;date d'arrivée&#41; :</label><br>
+  <input type="date" id="dateB1"><br>
+
+  <label for="prixB2">Prix sur l'étiquette &#40;prix d'origine&#41; :</label><br>
+  <input type="number" id="prixB2" step="0.01"><br>
+
+  <div id="result"></div>
+  <br/>
+  <div><a href="https://www.ebay.fr/str/artemis" target="_blank" class="lien"><img src="ebay.png" style="width: 20%;"></img></a>
+  <a href="https://www.facebook.com/marketplace/profile/61556564690392/" target="_blank" class="lien"><img src="marketplace.png" style="width: 20%;"></img></a></div>
+</div>
+
+<script>
+function calculer() {
+    var dateStr = document.getElementById('dateB1').value;
+    var prix = parseFloat(document.getElementById('prixB2').value) || 0;
+
+    if(!dateStr) {
+        document.getElementById('result').innerText = "";
+        return;
+    }
+
+    var dateB1 = new Date(dateStr);
+    var today = new Date();
+
+// Crée une date 10 mois dans le passé
+var tenMonthsAgo = new Date(today);
+tenMonthsAgo.setMonth(today.getMonth() - 10);
+
+// Vérification : si la date est antérieure à 10 mois, on bloque
+if (dateB1 < tenMonthsAgo) {
+    document.getElementById('result').innerHTML = "<span class='warning'>❌ La date est trop ancienne (>10 mois)</span>";
+    return; // stoppe le calcul
+}
+
+    var monthsElapsed = (today.getFullYear() - dateB1.getFullYear()) * 12 + (today.getMonth() - dateB1.getMonth());
+    if(today.getDate() < dateB1.getDate()) monthsElapsed -= 1;
+
+    var resultat = prix - (prix * 0.1 * monthsElapsed);
+
+    document.getElementById('result').innerHTML = "<span class='result'>Prix actuel : " + resultat.toFixed(2) + "€</span>";
+}
+
+// Calcul automatique à chaque changement
+document.getElementById('dateB1').addEventListener('input', calculer);
+document.getElementById('prixB2').addEventListener('input', calculer);
+
+// 🔹 Nouvelle partie : vider le prix au focus
+document.getElementById('prixB2').addEventListener('focus', function() {
+    this.value = ''; // vide le champ dès qu'on clique dedans
+});
+</script>
+
+</body>
+</html>
