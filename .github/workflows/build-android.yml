@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
+    - name: Checkout repository
       uses: actions/checkout@v3
 
     - name: Setup Java
@@ -29,16 +29,21 @@ jobs:
 
     - name: Create Cordova project
       run: |
-        cordova create app
+        cordova create app com.monapp.html MonApp
         cp -r www/* app/www/
         cp config.xml app/config.xml
+      shell: bash
+
+    - name: Add Android Platform
+      run: |
+        cd app
+        cordova platform add android
       shell: bash
 
     - name: Build Android APK
       run: |
         cd app
-        cordova platform add android
-        cordova build android
+        cordova build android --debug
       shell: bash
 
     - name: Upload APK
