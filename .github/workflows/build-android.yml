@@ -37,17 +37,17 @@ jobs:
     - name: Add Android Platform
       run: |
         cd app
-        cordova platform add android
+        cordova platform add android@11
       shell: bash
 
-    - name: Build Android APK
+    - name: Build APK with Gradle
       run: |
         cd app
-        cordova build android --debug
+        cordova build android --debug -- --no-telemetry
       shell: bash
 
-    - name: Upload APK
+    - name: Upload APK artifact
       uses: actions/upload-artifact@v4
       with:
         name: android-apk
-        path: app/platforms/android/app/build/outputs/apk/debug/*.apk
+        path: app/platforms/android/app/build/outputs/**/*.apk
